@@ -13,17 +13,36 @@ const JWT_SECRET = process.env.JWT_SECRET || 'umkm-digital-secret-key-2024-fallb
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'Polman@21';
 
-// ─── Supabase Client ────────────────────────────────────────────────────────────
+// ─── Supabase Client ──────────────────────────────────────────────
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.warn('⚠️  SUPABASE_URL atau SUPABASE_SERVICE_KEY belum diatur di .env');
+const subaseConfigured = !!(supabaseUrl && supabaseServiceKey);
+
+if (!subaseConfigured) {
+  console.warn('\n⚠️  ========================================');
+  console.warn('⚠️  SUPABASE belum dikonfigurasi!');
+  console.warn('⚠️  Isi .env dengan SUPABASE_URL dan');
+  console.warn('⚠️  SUPABASE_SERVICE_KEY dari dashboard Supabase');
+  console.warn('⚠️  ========================================\n');
 }
 
-const supabase = createClient(supabaseUrl || '', supabaseServiceKey || '', {
-  auth: { autoRefreshToken: false, persistSession: false }
-});
+// Buat dummy supabase client jika env belum diisi
+const supabase = subaseConfigured
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    })
+  : null;
+
+// Middleware: tolak request API jika Supabase belum dikonfigurasi
+const requireSupabase = (req, res, next) => {
+  if (!supabase) {
+    return res.status(503).json({
+      error: 'Database belum dikonfigurasi. Isi SUPABASE_URL dan SUPABASE_SERVICE_KEY di file .env'
+    });
+  }
+  next();
+};
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors());
@@ -88,7 +107,7 @@ async function uploadToSupabaseStorage(buffer, filename, mimeType, bucket = 'ass
 // ─── Auth Routes ───────────────────────────────────────────────────────────────
 
 // Register
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', requireSupabase, async (req, res) => {
   try {
     const { name, email, password, gemini_api_key } = req.body;
     if (!name || !email || !password) {
@@ -123,7 +142,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // Login
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', requireSupabase, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -161,7 +180,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // Get current user
-app.get('/api/auth/me', authMiddleware, async (req, res) => {
+app.get('/api/auth/me', authMiddleware, requireSupabase, async (req, res) => {
   const { data: user } = await supabase
     .from('users')
     .select('id, name, email, gemini_api_key, created_at, last_login')
@@ -175,7 +194,7 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
 // ─── User Routes ───────────────────────────────────────────────────────────────
 
 // Update API Key
-app.put('/api/user/apikey', authMiddleware, async (req, res) => {
+app.put('/api/user/apikey', authMiddleware, requireSupabase, async (req, res) => {
   const { gemini_api_key } = req.body;
   if (!gemini_api_key) return res.status(400).json({ error: 'API Key wajib diisi' });
 
@@ -189,7 +208,7 @@ app.put('/api/user/apikey', authMiddleware, async (req, res) => {
 });
 
 // Get user profile
-app.get('/api/user/profile', authMiddleware, async (req, res) => {
+app.get('/api/user/profile', authMiddleware, requireSupabase, async (req, res) => {
   const { data: user } = await supabase
     .from('users')
     .select('id, name, email, gemini_api_key, created_at')
@@ -200,7 +219,7 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
 });
 
 // ─── Messages Routes ───────────────────────────────────────────────────────────
-app.post('/api/messages', authMiddleware, async (req, res) => {
+app.post('/api/messages', authMiddleware, requireSupabase, async (req, res) => {
   const { subject, message } = req.body;
   if (!message) return res.status(400).json({ error: 'Pesan wajib diisi' });
 
@@ -235,7 +254,7 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 // Get all users
-app.get('/api/admin/users', adminMiddleware, async (req, res) => {
+app.get('/api/admin/users', adminMiddleware, requireSupabase, async (req, res) => {
   const { data: users, error } = await supabase
     .from('users')
     .select('id, name, email, created_at, last_login, gemini_api_key')
@@ -254,7 +273,7 @@ app.get('/api/admin/users', adminMiddleware, async (req, res) => {
 });
 
 // Get all messages
-app.get('/api/admin/messages', adminMiddleware, async (req, res) => {
+app.get('/api/admin/messages', adminMiddleware, requireSupabase, async (req, res) => {
   const { data: messages, error } = await supabase
     .from('messages')
     .select('*')
@@ -265,7 +284,7 @@ app.get('/api/admin/messages', adminMiddleware, async (req, res) => {
 });
 
 // Mark message as read
-app.put('/api/admin/messages/:id/read', adminMiddleware, async (req, res) => {
+app.put('/api/admin/messages/:id/read', adminMiddleware, requireSupabase, async (req, res) => {
   const { error } = await supabase
     .from('messages')
     .update({ is_read: true })
@@ -276,14 +295,25 @@ app.put('/api/admin/messages/:id/read', adminMiddleware, async (req, res) => {
 });
 
 // Delete message
-app.delete('/api/admin/messages/:id', adminMiddleware, async (req, res) => {
+app.delete('/api/admin/messages/:id', adminMiddleware, requireSupabase, async (req, res) => {
   const { error } = await supabase.from('messages').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
-// Get settings
+// Get settings — returns default values if Supabase not configured
 app.get('/api/admin/settings', async (req, res) => {
+  if (!supabase) {
+    // Return default settings when DB not configured (dev mode)
+    return res.json({
+      settings: {
+        favicon_url: '/assets/favicon.jpg',
+        logo_url: '/assets/logo.jpg',
+        app_name: 'UMKM Digital'
+      }
+    });
+  }
+
   const { data, error } = await supabase.from('app_settings').select('*');
   if (error) return res.status(500).json({ error: error.message });
 
@@ -340,14 +370,14 @@ app.post('/api/admin/settings', adminMiddleware,
 );
 
 // Delete user
-app.delete('/api/admin/users/:id', adminMiddleware, async (req, res) => {
+app.delete('/api/admin/users/:id', adminMiddleware, requireSupabase, async (req, res) => {
   const { error } = await supabase.from('users').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
 // Stats
-app.get('/api/admin/stats', adminMiddleware, async (req, res) => {
+app.get('/api/admin/stats', adminMiddleware, requireSupabase, async (req, res) => {
   try {
     const [
       { count: totalUsers },
