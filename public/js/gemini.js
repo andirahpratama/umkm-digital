@@ -1,5 +1,5 @@
 /* =========================================================
-   UMKM Digital — Gemini API & F&B Image Generation Engine
+   UMKM Digital — Gemini API & Professional F&B Image Engine
    ========================================================= */
 
 const GEMINI_TEXT_MODEL = 'gemini-1.5-flash';
@@ -29,7 +29,6 @@ async function validateGeminiApiKey(apiKey) {
   if (!apiKey || typeof apiKey !== 'string') return false;
   const cleanKey = apiKey.trim();
 
-  // Basic length check (Gemini / GCP API Keys are >= 10 chars)
   if (cleanKey.length < 10) return false;
 
   try {
@@ -50,12 +49,10 @@ async function validateGeminiApiKey(apiKey) {
     const errData = await res.json().catch(() => ({}));
     const errMsg = errData?.error?.message || '';
 
-    // If Google explicitly rejected key as invalid
     if (errMsg.toLowerCase().includes('api key not valid') || errMsg.toLowerCase().includes('invalid api key')) {
       return false;
     }
 
-    // For other errors (quota limit 429, tier limitation), if length >= 15 allow saving
     return cleanKey.length >= 15;
   } catch {
     return cleanKey.length >= 15;
@@ -63,7 +60,7 @@ async function validateGeminiApiKey(apiKey) {
 }
 
 /**
- * Generate promotional image using Imagen 3 API or Canvas Studio Fallback
+ * Generate promotional image using Imagen 3 API or Studio F&B Poster Engine
  */
 async function generatePromotionalImage(apiKey, productPhoto, logoFile, theme, promoDesc, platform) {
   const cleanKey = apiKey.trim();
@@ -73,10 +70,10 @@ async function generatePromotionalImage(apiKey, productPhoto, logoFile, theme, p
     const imagenResult = await tryImagen3Generation(cleanKey, theme, promoDesc, platform);
     if (imagenResult) return imagenResult;
   } catch (err) {
-    console.warn('Imagen 3 API skipped/failed, switching to AI Graphic Composite Engine:', err.message);
+    console.warn('Imagen 3 API skipped/failed, using Studio F&B Poster Engine:', err.message);
   }
 
-  // 2. Fallback: AI Graphic Composite Engine (Guaranteed to work for all API key tiers)
+  // 2. Fallback: Commercial Agency-Grade F&B Poster Engine (Guaranteed 100% success)
   return await generateStudioCompositeImage(cleanKey, productPhoto, logoFile, theme, promoDesc, platform);
 }
 
@@ -84,7 +81,7 @@ async function generatePromotionalImage(apiKey, productPhoto, logoFile, theme, p
  * Try generating image via Imagen 3 REST API
  */
 async function tryImagen3Generation(apiKey, theme, promoDesc, platform) {
-  const prompt = `Professional food and beverage product promotional poster for ${platform === 'wa_story' ? 'WhatsApp Story 9:16' : 'Instagram Post 3:4'}. ${theme ? 'Theme: ' + theme + '.' : ''} ${promoDesc ? 'Promo text: ' + promoDesc + '.' : ''} Premium commercial studio lighting, vibrant colors, clean layout, high resolution 4k F&B advertising quality, no watermarks.`;
+  const prompt = `Commercial professional F&B advertisement poster for ${platform === 'wa_story' ? 'WhatsApp Story 9:16' : 'Instagram Post 3:4'}. ${theme ? 'Theme: ' + theme + '.' : ''} ${promoDesc ? 'Promo text: ' + promoDesc + '.' : ''} Studio lighting, mouth-watering food photography, vibrant advertising graphics, high resolution 4k F&B ad layout, clean typography.`;
 
   const res = await fetch(
     `${GEMINI_BASE_URL}/imagen-3.0-generate-002:predict?key=${apiKey}`,
@@ -112,22 +109,22 @@ async function tryImagen3Generation(apiKey, theme, promoDesc, platform) {
 }
 
 /**
- * Generate Studio Composite Image using Gemini AI & HTML5 Canvas
+ * Generate Studio Composite Poster using Gemini Multimodal Vision & HTML5 Canvas
  */
 async function generateStudioCompositeImage(apiKey, productPhoto, logoFile, theme, promoDesc, platform) {
-  // Extract text design elements using Gemini text API
+  // Analyze photo with Gemini Vision to get creative design text
   let copyData = {
-    headline: 'PROMO SPESIAL',
-    subheadline: promoDesc || 'Nikmati kelezatan terbaik hari ini!',
-    badge: 'BEST SELLER',
-    colorTheme: 'dark_gold'
+    headline: 'PEDASNYA BIKIN NAGIH!',
+    subheadline: promoDesc || 'Renyah, Gurih & Bumbu Melimpah',
+    badge: '🔥 BEST SELLER',
+    colorTheme: 'red_gold'
   };
 
   try {
-    const aiCopy = await getAICopyDesign(apiKey, theme, promoDesc);
+    const aiCopy = await getAICopyFromVision(apiKey, productPhoto, theme, promoDesc);
     if (aiCopy) copyData = { ...copyData, ...aiCopy };
   } catch (e) {
-    console.warn('Using default graphic copy fallback:', e);
+    console.warn('Vision analysis fallback used:', e);
   }
 
   // Convert product photo to Data URL
@@ -151,61 +148,58 @@ async function generateStudioCompositeImage(apiKey, productPhoto, logoFile, them
 }
 
 /**
- * Call Gemini Text API for AI Graphic Copy
+ * Call Gemini Vision to analyze food photo and return design copy JSON
  */
-async function getAICopyDesign(apiKey, theme, promoDesc) {
-  const prompt = `Kamu adalah seorang Copywriter & Art Director F&B. Buat 1 judul promosi singkat (max 4 kata), 1 sub-judul (max 8 kata), 1 teks badge promo (max 2 kata, misal: 'DISC 50%', 'LIMITED', 'BEST SELLER').
-  Input Tema: "${theme || 'Modern F&B'}". Promo: "${promoDesc || 'Spesial Hari Ini'}".
-  Keluarkan HANYA JSON berformat valid tanpa markdown:
+async function getAICopyFromVision(apiKey, productPhoto, theme, promoDesc) {
+  const { base64, mimeType } = await fileToBase64(productPhoto);
+
+  const prompt = `Analisis foto makanan/minuman ini secara mendalam.
+  Buat elemen desain promosi iklan F&B profesional:
+  1. headline: Judul promo iklan yang SANGAT MENARIK & PROVOKATIF (maks 4 kata, misal: "PEDASNYA BIKIN NAGIH!", "KELEZATAN TIADA TARA!", "GURIH RENYAH SPESIAL!").
+  2. subheadline: Teks pendukung promo (maks 8 kata, misal: "${promoDesc || 'Dibuat dengan bahan kualitas terbaik'}").
+  3. badge: Teks badge promo (maks 2 kata, misal: "🔥 BEST SELLER", "⚡ PROMO HARI INI", "💥 DISC 50%").
+
+  Format keluaran HANYA JSON valid tanpa markdown formatting:
   {"headline": "...", "subheadline": "...", "badge": "..."}`;
 
-  const res = await fetch(
-    `${GEMINI_BASE_URL}/${GEMINI_TEXT_MODEL}:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 200 }
-      })
-    }
-  );
+  const parts = [
+    { inlineData: { data: base64, mimeType } },
+    { text: prompt }
+  ];
 
-  if (!res.ok) {
-    // Retry with alt model
-    const resAlt = await fetch(
-      `${GEMINI_BASE_URL}/${GEMINI_TEXT_MODEL_ALT}:generateContent?key=${apiKey}`,
+  try {
+    const res = await fetch(
+      `${GEMINI_BASE_URL}/${GEMINI_TEXT_MODEL}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 200 }
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.8, maxOutputTokens: 300 }
         })
       }
     );
-    if (!resAlt.ok) return null;
-    const dataAlt = await resAlt.json();
-    const rawTxt = dataAlt.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const cleaned = rawTxt.replace(/```json|```/g, '').trim();
-    return JSON.parse(cleaned);
-  }
 
-  const data = await res.json();
-  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  const cleaned = rawText.replace(/```json|```/g, '').trim();
-  return JSON.parse(cleaned);
+    if (res.ok) {
+      const data = await res.json();
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const cleaned = rawText.replace(/```json|```/g, '').trim();
+      return JSON.parse(cleaned);
+    }
+  } catch (err) {
+    console.warn('Vision copy failed:', err);
+  }
+  return null;
 }
 
 /**
- * Render Studio F&B Poster to Canvas and return base64
+ * Render Studio F&B Poster to Canvas
  */
 async function renderPosterCanvas(productImgUrl, logoImgUrl, copy, platform) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    // Canvas size
     const isWA = platform === 'wa_story';
     canvas.width = 1080;
     canvas.height = isWA ? 1920 : 1350;
@@ -213,54 +207,69 @@ async function renderPosterCanvas(productImgUrl, logoImgUrl, copy, platform) {
     const width = canvas.width;
     const height = canvas.height;
 
-    // Load Product Image
     const pImg = new Image();
     pImg.crossOrigin = 'Anonymous';
     pImg.src = productImgUrl;
     pImg.onload = () => {
 
-      // 1. Draw Luxurious Dark/Vibrant F&B Background Gradient
-      const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 100, width / 2, height / 2, height * 0.8);
-      bgGrad.addColorStop(0, '#1E293B');
-      bgGrad.addColorStop(0.5, '#0F172A');
-      bgGrad.addColorStop(1, '#020617');
+      // 1. Studio Backdrop (Dark Crimson & Charcoal Radial Gradient)
+      const bgGrad = ctx.createRadialGradient(width / 2, height * 0.45, 100, width / 2, height / 2, height * 0.85);
+      bgGrad.addColorStop(0, '#2D0A0E'); // Deep Crimson
+      bgGrad.addColorStop(0.5, '#180608'); // Dark Maroon
+      bgGrad.addColorStop(1, '#050203'); // Charcoal Black
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Decorative Light Glow Effects
-      const glowGrad = ctx.createRadialGradient(width / 2, isWA ? 950 : 650, 50, width / 2, isWA ? 950 : 650, 500);
-      glowGrad.addColorStop(0, 'rgba(217, 119, 6, 0.35)');
-      glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = glowGrad;
+      // Ambient Gold & Orange Spotlight Beams
+      const spotGrad = ctx.createRadialGradient(width / 2, isWA ? 980 : 680, 80, width / 2, isWA ? 980 : 680, 600);
+      spotGrad.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
+      spotGrad.addColorStop(0.5, 'rgba(220, 38, 38, 0.25)');
+      spotGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = spotGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Draw Product Photo Container with Glassmorphism Border & Shadow
+      // Floating Particle Ember Sparkles
       ctx.save();
-      const pBoxWidth = width * 0.82;
-      const pBoxHeight = isWA ? height * 0.44 : height * 0.52;
-      const pBoxX = (width - pBoxWidth) / 2;
-      const pBoxY = isWA ? 580 : 360;
-      const radius = 32;
+      for (let i = 0; i < 40; i++) {
+        const px = Math.random() * width;
+        const py = Math.random() * height;
+        const pr = Math.random() * 4 + 1;
+        ctx.beginPath();
+        ctx.arc(px, py, pr, 0, Math.PI * 2);
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(252, 211, 77, 0.6)' : 'rgba(248, 113, 113, 0.5)';
+        ctx.shadowColor = '#F59E0B';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+      }
+      ctx.restore();
 
-      // Drop Shadow
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-      ctx.shadowBlur = 40;
-      ctx.shadowOffsetY = 20;
+      // 2. Food Hero Container Frame
+      ctx.save();
+      const pBoxWidth = width * 0.86;
+      const pBoxHeight = isWA ? height * 0.46 : height * 0.54;
+      const pBoxX = (width - pBoxWidth) / 2;
+      const pBoxY = isWA ? 560 : 330;
+      const radius = 36;
+
+      // Glow Outer Shadow
+      ctx.shadowColor = 'rgba(239, 68, 68, 0.6)';
+      ctx.shadowBlur = 45;
+      ctx.shadowOffsetY = 15;
 
       // Rounded container fill
       ctx.beginPath();
       ctx.roundRect(pBoxX, pBoxY, pBoxWidth, pBoxHeight, radius);
-      ctx.fillStyle = '#0F172A';
+      ctx.fillStyle = '#0F0406';
       ctx.fill();
       ctx.restore();
 
-      // Clip product photo inside container
+      // Clip product image
       ctx.save();
       ctx.beginPath();
       ctx.roundRect(pBoxX, pBoxY, pBoxWidth, pBoxHeight, radius);
       ctx.clip();
 
-      // Fit product image cover style
+      // Draw product image cover style
       const imgRatio = pImg.width / pImg.height;
       const boxRatio = pBoxWidth / pBoxHeight;
       let renderW, renderH, renderX, renderY;
@@ -278,39 +287,49 @@ async function renderPosterCanvas(productImgUrl, logoImgUrl, copy, platform) {
       }
       ctx.drawImage(pImg, renderX, renderY, renderW, renderH);
 
-      // Subtle Overlay Gradient on Bottom of Product Image
-      const pGrad = ctx.createLinearGradient(0, pBoxY + pBoxHeight - 150, 0, pBoxY + pBoxHeight);
+      // Vignette Overlay on bottom of photo frame
+      const pGrad = ctx.createLinearGradient(0, pBoxY + pBoxHeight - 160, 0, pBoxY + pBoxHeight);
       pGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      pGrad.addColorStop(1, 'rgba(0,0,0,0.6)');
+      pGrad.addColorStop(1, 'rgba(15, 4, 6, 0.85)');
       ctx.fillStyle = pGrad;
       ctx.fillRect(pBoxX, pBoxY, pBoxWidth, pBoxHeight);
       ctx.restore();
 
-      // Gold Container Border
+      // Golden Neon Frame Border
       ctx.save();
       ctx.beginPath();
       ctx.roundRect(pBoxX, pBoxY, pBoxWidth, pBoxHeight, radius);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = 'rgba(217, 119, 6, 0.6)';
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
+      ctx.shadowColor = '#F59E0B';
+      ctx.shadowBlur = 20;
       ctx.stroke();
       ctx.restore();
 
-      // 3. Draw Promo Badge Tag
+      // 3. Promo Badge Tag
       if (copy.badge) {
         ctx.save();
         const badgeX = pBoxX + 30;
         const badgeY = pBoxY + 30;
-        ctx.font = 'bold 28px sans-serif';
+        ctx.font = '900 30px sans-serif';
         const textWidth = ctx.measureText(copy.badge.toUpperCase()).width;
-        const badgeW = textWidth + 40;
-        const badgeH = 50;
+        const badgeW = textWidth + 46;
+        const badgeH = 56;
+
+        const bGrad = ctx.createLinearGradient(badgeX, 0, badgeX + badgeW, 0);
+        bGrad.addColorStop(0, '#DC2626');
+        bGrad.addColorStop(1, '#991B1B');
 
         ctx.beginPath();
-        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 12);
-        ctx.fillStyle = '#DC2626'; // Spicy Red
-        ctx.shadowColor = 'rgba(220, 38, 38, 0.5)';
-        ctx.shadowBlur = 15;
+        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 14);
+        ctx.fillStyle = bGrad;
+        ctx.shadowColor = 'rgba(220, 38, 38, 0.7)';
+        ctx.shadowBlur = 20;
         ctx.fill();
+
+        ctx.strokeStyle = '#FEE2E2';
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
         ctx.fillStyle = '#FFFFFF';
         ctx.textAlign = 'center';
@@ -319,48 +338,62 @@ async function renderPosterCanvas(productImgUrl, logoImgUrl, copy, platform) {
         ctx.restore();
       }
 
-      // 4. Draw Header Brand & Text Promos
+      // 4. Header Titles & Typography
       ctx.save();
-      // Tag line / Header
-      ctx.font = '900 64px sans-serif';
-      ctx.fillStyle = '#F59E0B'; // Gold Accent
-      ctx.textAlign = 'center';
-      ctx.shadowColor = 'rgba(245, 158, 11, 0.4)';
-      ctx.shadowBlur = 20;
+      const headerY = isWA ? 220 : 140;
 
-      const headerY = isWA ? 240 : 160;
+      // Golden Main Headline
+      ctx.font = '900 68px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(245, 158, 11, 0.6)';
+      ctx.shadowBlur = 25;
+
+      const hGrad = ctx.createLinearGradient(0, headerY - 50, 0, headerY + 10);
+      hGrad.addColorStop(0, '#FDE68A');
+      hGrad.addColorStop(0.5, '#F59E0B');
+      hGrad.addColorStop(1, '#D97706');
+      ctx.fillStyle = hGrad;
+
       ctx.fillText(copy.headline.toUpperCase(), width / 2, headerY);
 
-      // Subheadline / Promo Description
-      ctx.font = '500 34px sans-serif';
-      ctx.fillStyle = '#E2E8F0';
-      ctx.shadowBlur = 0;
-      ctx.fillText(copy.subheadline, width / 2, headerY + 60);
+      // Subheadline Ribbon
+      ctx.font = '600 34px sans-serif';
+      ctx.fillStyle = '#F3F4F6';
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur = 10;
+      ctx.fillText(copy.subheadline, width / 2, headerY + 64);
       ctx.restore();
 
-      // 5. Draw Footer Call To Action Box
+      // 5. Footer Call To Action Button
       ctx.save();
-      const ctaY = isWA ? height - 240 : height - 160;
-      const ctaW = width * 0.75;
-      const ctaH = 90;
+      const ctaY = isWA ? height - 230 : height - 150;
+      const ctaW = width * 0.78;
+      const ctaH = 96;
       const ctaX = (width - ctaW) / 2;
 
       const ctaGrad = ctx.createLinearGradient(ctaX, 0, ctaX + ctaW, 0);
-      ctaGrad.addColorStop(0, '#D97706');
+      ctaGrad.addColorStop(0, '#F59E0B');
+      ctaGrad.addColorStop(0.5, '#EF4444');
       ctaGrad.addColorStop(1, '#DC2626');
 
       ctx.beginPath();
-      ctx.roundRect(ctaX, ctaY, ctaW, ctaH, 45);
+      ctx.roundRect(ctaX, ctaY, ctaW, ctaH, 48);
       ctx.fillStyle = ctaGrad;
-      ctx.shadowColor = 'rgba(217, 119, 6, 0.5)';
-      ctx.shadowBlur = 25;
+      ctx.shadowColor = 'rgba(239, 68, 68, 0.7)';
+      ctx.shadowBlur = 30;
       ctx.fill();
 
-      ctx.font = 'bold 36px sans-serif';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#FEF08A';
+      ctx.stroke();
+
+      ctx.font = '900 38px sans-serif';
       ctx.fillStyle = '#FFFFFF';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('🔥 PESAN SEKARANG JUGAK!', width / 2, ctaY + ctaH / 2 + 2);
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 10;
+      ctx.fillText('🛒 PESAN SEKARANG JUGAK!', width / 2, ctaY + ctaH / 2 + 2);
       ctx.restore();
 
       // 6. Draw Logo (if provided)
@@ -370,24 +403,33 @@ async function renderPosterCanvas(productImgUrl, logoImgUrl, copy, platform) {
         lImg.src = logoImgUrl;
         lImg.onload = () => {
           ctx.save();
-          const logoSize = 100;
-          const logoX = width - 150;
-          const logoY = 80;
+          const logoSize = 110;
+          const logoX = width - 160;
+          const logoY = 70;
+
+          // Logo Background Circle
+          ctx.beginPath();
+          ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 + 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.shadowColor = 'rgba(0,0,0,0.5)';
+          ctx.shadowBlur = 15;
+          ctx.fill();
+
           ctx.beginPath();
           ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2, 0, Math.PI * 2);
           ctx.clip();
           ctx.drawImage(lImg, logoX, logoY, logoSize, logoSize);
           ctx.restore();
 
-          const base64Data = canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
+          const base64Data = canvas.toDataURL('image/jpeg', 0.94).split(',')[1];
           resolve({ imageBase64: base64Data, mimeType: 'image/jpeg' });
         };
         lImg.onerror = () => {
-          const base64Data = canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
+          const base64Data = canvas.toDataURL('image/jpeg', 0.94).split(',')[1];
           resolve({ imageBase64: base64Data, mimeType: 'image/jpeg' });
         };
       } else {
-        const base64Data = canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
+        const base64Data = canvas.toDataURL('image/jpeg', 0.94).split(',')[1];
         resolve({ imageBase64: base64Data, mimeType: 'image/jpeg' });
       }
     };
@@ -395,45 +437,54 @@ async function renderPosterCanvas(productImgUrl, logoImgUrl, copy, platform) {
 }
 
 /**
- * Generate promotional caption using Gemini text API
+ * Generate viral promotional caption using Gemini Multimodal Vision API
  */
-async function generateCaption(apiKey, productInfo, theme, promoDesc, platform) {
+async function generateCaption(apiKey, productPhoto, theme, promoDesc, platform) {
   const cleanKey = apiKey.trim();
 
-  const platformConfig = {
-    wa_story: {
-      style: `Caption untuk WhatsApp Story:
-- Maksimal 3 kalimat, singkat dan langsung to the point
-- Gunakan emoji yang relevan dan menarik (2-3 emoji)
-- Tone: casual, friendly, seperti teman yang merekomendasikan
-- Tambahkan call-to-action yang mendesak (contoh: "Chat sekarang!", "Stok terbatas!")
-- Bikin penasaran dan FOMO
-- JANGAN gunakan hashtag`,
-    },
-    instagram: {
-      style: `Caption untuk Instagram Post:
-- 2-4 baris dengan hook kuat di kalimat pertama
-- Gunakan line break untuk readability
-- Tambahkan 5-8 hashtag yang relevan di akhir
-- Tone: aspirasional, lifestyle-oriented, premium feel
-- Sertakan call-to-action (DM, link bio, atau komentar)
-- Gunakan emoji secara strategis`,
+  let imagePart = null;
+  if (productPhoto && typeof productPhoto === 'object' && productPhoto.name) {
+    try {
+      const { base64, mimeType } = await fileToBase64(productPhoto);
+      imagePart = { inlineData: { data: base64, mimeType } };
+    } catch (e) {
+      console.warn('Failed to convert product photo for caption:', e);
     }
+  }
+
+  const platformConfig = {
+    wa_story: `Format: WhatsApp Story (Status WA)
+- Maksimal 3-4 kalimat, singkat, menggugah selera makan, dan langsung to the point
+- Gunakan emoji yang sangat relevan dan menarik (3-4 emoji)
+- Call-To-Action yang mendesak (contoh: "Chat kami sekarang!", "Stok terbatas hari ini!")
+- JANGAN gunakan hashtag sama sekali.`,
+    instagram: `Format: Instagram Post
+- 2-4 baris paragraf dengan Hook kuat di kalimat pertama
+- Gunakan line break yang rapi
+- Tambahkan 6-8 hashtag F&B dan UMKM populer di bagian akhir
+- Call-To-Action jualan (DM / Klik Link di Bio)`
   };
 
-  const config = platformConfig[platform];
-  const prompt = `
-Kamu adalah Copywriter F&B Profesional.
-Buat caption promosi produk makanan/minuman berdasarkan informasi berikut:
-- Nama Produk: ${productInfo}
-- Tema Promosi: ${theme || 'Promosi Harian'}
-- Detail Promo: ${promoDesc || 'Spesial Hari Ini'}
+  const promptText = `
+Kamu adalah Copywriter Marketing F&B Kelas Dunia & Viral Strategist.
+Analisis foto produk makanan/minuman yang diunggah ini.
 
-Instruksi Format:
-${config.style}
-- Gunakan Bahasa Indonesia yang natural dan engaging
-- Output HANYA teks caption, tanpa kata pengantar atau penjelasan tambahan.
+Tugas: Buat caption promosi yang SANGAT MENARIK, GURIH, dan PERSUASIF untuk produk di foto ini.
+Detail Tema: ${theme || 'Promosi Utama Harian'}.
+Detail Promo: ${promoDesc || 'Penawaran Spesial Hari Ini'}.
+
+${platformConfig[platform] || platformConfig.wa_story}
+
+ATURAN MUTLAK KUALITAS:
+- JANGAN PERNAH menyertakan nama file seperti 'IMG...', 'DCIM...', atau kode angka di dalam caption!
+- Kenali jenis makanan di foto (misal: makaroni pedas, nasi goreng, boba, snack, dll) dan buat caption khusus tentang kelezatan makanan tersebut!
+- Gunakan Bahasa Indonesia yang natural, kekinian, dan membakar selera makan pembaca.
+- HANYA keluarkan teks caption-nya saja, tanpa kata pengantar atau tanda petik.
 `.trim();
+
+  const parts = [];
+  if (imagePart) parts.push(imagePart);
+  parts.push({ text: promptText });
 
   try {
     const res = await fetch(
@@ -442,8 +493,8 @@ ${config.style}
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 1.0, maxOutputTokens: 400 }
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.9, maxOutputTokens: 500 }
         })
       }
     );
@@ -461,8 +512,8 @@ ${config.style}
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 1.0, maxOutputTokens: 400 }
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.9, maxOutputTokens: 500 }
         })
       }
     );
@@ -472,9 +523,9 @@ ${config.style}
       const textAlt = dataAlt.candidates?.[0]?.content?.parts?.[0]?.text;
       if (textAlt) return textAlt.trim();
     }
-
-    return `🔥 Promo Spesial ${productInfo}! ${promoDesc || 'Yuk cobain sekarang sebelum kehabisan!'}`;
   } catch (err) {
-    return `🔥 Promo Spesial ${productInfo}! ${promoDesc || 'Yuk order sekarang!'}`;
+    console.error('Caption generation error:', err);
   }
+
+  return `🔥 PROMO SPESIAL HARI INI! 😋\nNikmati kelezatan produk F&B pilihan dengan cita rasa gurih & renyah tiada tara. ${promoDesc ? promoDesc + '!' : ''} Pesan sekarang juga sebelum kehabisan! 📱✨`;
 }

@@ -154,9 +154,8 @@ async function handleGenerate(e, platform) {
       user.gemini_api_key, productFile, logoFile, theme, promo, platform
     );
 
-    // Generate caption
-    const productName = productFile.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-    const caption = await generateCaption(user.gemini_api_key, productName, theme, promo, platform);
+    // Generate caption with Gemini Vision analyzing the product photo
+    const caption = await generateCaption(user.gemini_api_key, productFile, theme, promo, platform);
 
     // Store results
     currentGeneratedImage = { imageBase64, mimeType };
