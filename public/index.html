@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UMKM Digital — AI Image Generator Promosi</title>
+  <meta name="description" content="Generate gambar promosi produk makanan & minuman UMKM secara otomatis dengan AI. Buat konten WhatsApp Story dan Instagram yang menarik dalam hitungan detik.">
+  <link rel="icon" type="image/jpeg" href="/assets/favicon.jpg" id="favicon-link">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<!-- ─── Particles Background ─────────────────────────────── -->
+<div class="particles-bg" id="particles-bg"></div>
+
+<!-- ─── Loading Screen ───────────────────────────────────── -->
+<div class="loading-screen" id="loading-screen">
+  <img src="/assets/logo.jpg" alt="UMKM Digital" class="loading-logo">
+  <div class="spinner"></div>
+  <p style="color:var(--color-text-muted);font-size:var(--text-sm)">Memuat UMKM Digital...</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- AUTH PAGE                                              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="auth-page" class="hidden">
+  <div class="auth-page">
+    <div class="glass-card auth-container">
+
+      <!-- Branding Side -->
+      <div class="auth-branding">
+        <img src="/assets/logo.jpg" alt="UMKM Digital Logo" class="branding-logo" id="auth-logo">
+        <div>
+          <h1 class="branding-title">
+            <span class="gold">UMKM</span><br>Digital
+          </h1>
+        </div>
+        <p class="branding-desc">
+          Platform AI untuk generate gambar promosi produk makanan & minuman UMKM kamu secara otomatis. Profesional, cepat, dan hemat biaya!
+        </p>
+        <div class="branding-features">
+          <div class="branding-feature">
+            <div class="branding-feature-icon">🤖</div>
+            <span>Powered by Google Gemini AI</span>
+          </div>
+          <div class="branding-feature">
+            <div class="branding-feature-icon">📱</div>
+            <span>WhatsApp Story & Instagram Ready</span>
+          </div>
+          <div class="branding-feature">
+            <div class="branding-feature-icon">⚡</div>
+            <span>Generate dalam hitungan detik</span>
+          </div>
+          <div class="branding-feature">
+            <div class="branding-feature-icon">🎨</div>
+            <span>Desain promosi profesional</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Side -->
+      <div class="auth-form-side">
+
+        <!-- LOGIN FORM -->
+        <div id="login-form-wrapper">
+          <div class="auth-form-header">
+            <h1>Masuk ke Akun</h1>
+            <p>Selamat datang kembali! Masuk untuk mulai generate.</p>
+          </div>
+
+          <div class="alert alert-error hidden" id="login-error-wrapper">
+            <span>⚠️</span>
+            <span id="login-error"></span>
+          </div>
+
+          <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email</label>
+              <input class="form-input" type="email" id="login-email" placeholder="nama@email.com" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <div class="password-input-wrapper">
+                <input class="form-input" type="password" id="login-password" placeholder="Masukkan password" required autocomplete="current-password">
+                <button type="button" class="password-toggle">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn">
+              Masuk ke Dashboard
+            </button>
+          </form>
+
+          <div class="auth-switch">
+            Belum punya akun? <a onclick="switchToRegister()">Daftar Gratis</a>
+          </div>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="register-form-wrapper" class="hidden">
+          <div class="auth-form-header">
+            <h1>Buat Akun Baru</h1>
+            <p>Daftar gratis dan mulai generate promosi produkmu!</p>
+          </div>
+
+          <div class="alert alert-error hidden" id="register-error-wrapper">
+            <span>⚠️</span>
+            <span id="register-error"></span>
+          </div>
+
+          <form id="register-form" onsubmit="handleRegister(event)">
+            <div class="form-group">
+              <label class="form-label" for="reg-name">Nama Lengkap</label>
+              <input class="form-input" type="text" id="reg-name" placeholder="Nama kamu" required autocomplete="name">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-email">Email</label>
+              <input class="form-input" type="email" id="reg-email" placeholder="nama@email.com" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Password</label>
+              <div class="password-input-wrapper">
+                <input class="form-input" type="password" id="reg-password" placeholder="Minimal 6 karakter" required autocomplete="new-password">
+                <button type="button" class="password-toggle">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-confirm-password">Konfirmasi Password</label>
+              <div class="password-input-wrapper">
+                <input class="form-input" type="password" id="reg-confirm-password" placeholder="Ulangi password" required autocomplete="new-password">
+                <button type="button" class="password-toggle">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-apikey">
+                Gemini API Key
+                <span class="optional">(opsional, bisa diisi nanti)</span>
+              </label>
+              <div class="password-input-wrapper">
+                <input class="form-input" type="password" id="reg-apikey" placeholder="AIza..." autocomplete="off">
+                <button type="button" class="password-toggle">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+              <div class="api-key-hint">
+                <span>💡</span>
+                <span>Dapatkan API Key gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>. Aktifkan model <strong>Gemini 2.0 Flash Preview Image Generation</strong>.</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg">
+              Buat Akun Gratis
+            </button>
+          </form>
+
+          <div class="auth-switch">
+            Sudah punya akun? <a onclick="switchToLogin()">Masuk</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- DASHBOARD PAGE                                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="dashboard-page" class="app-shell hidden">
+
+  <!-- ─── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="#">
+      <img src="/assets/logo.jpg" alt="UMKM Digital" class="navbar-logo" id="nav-logo">
+      <span class="navbar-brand-name" id="nav-app-name">UMKM Digital</span>
+    </a>
+
+    <!-- Desktop Nav Tabs -->
+    <div class="navbar-center">
+      <div class="nav-tabs-main">
+        <button class="nav-tab active" data-tab="wa-story">
+          <span>📱</span> WA Story
+        </button>
+        <button class="nav-tab" data-tab="instagram">
+          <span>📷</span> Instagram
+        </button>
+        <button class="nav-tab" data-tab="feedback">
+          <span>💌</span> Saran & Masukan
+        </button>
+      </div>
+    </div>
+
+    <!-- User Menu -->
+    <div class="navbar-right">
+      <div class="user-menu">
+        <button class="user-btn" id="user-btn">
+          <div class="user-avatar" id="user-avatar">U</div>
+          <span id="user-name">User</span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="dropdown-header">
+            <div class="fw-semibold" id="dropdown-user-name"></div>
+            <div class="text-sm text-muted" id="dropdown-user-email"></div>
+          </div>
+          <button class="dropdown-item" onclick="openApiKeyModal()">
+            <span>🔑</span> Kelola API Key
+          </button>
+          <button class="dropdown-item danger" onclick="handleLogout()">
+            <span>🚪</span> Keluar
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── API Key Banner ──────────────────────────────────── -->
+  <div style="padding: 12px 32px; padding-top: 80px; max-width:1400px; margin: 0 auto;" id="api-key-banner-wrapper">
+    <div class="api-key-banner hidden" id="api-key-banner">
+      <div class="api-key-icon">🔑</div>
+      <div class="api-key-banner-content">
+        <div class="api-key-banner-title">API Key Belum Diatur</div>
+        <div class="api-key-banner-desc">Kamu perlu menambahkan Gemini API Key untuk bisa generate gambar promosi. API Key gratis dari Google AI Studio.</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openApiKeyModal()">
+        Tambah API Key
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── Main Content ────────────────────────────────────── -->
+  <main class="main-content" style="padding-top: 16px;">
+
+    <!-- ═══ WA STORY TAB ════════════════════════════════════ -->
+    <div class="tab-page active" data-tab-content="wa-story">
+      <div class="hero-banner" style="padding-top: var(--space-lg)">
+        <div class="hero-badge">
+          <span>📱</span> WhatsApp Story Format • 9:16
+        </div>
+        <h1 class="hero-title">
+          Generate Promosi<br><span class="highlight">WhatsApp Story</span>
+        </h1>
+        <p class="hero-subtitle">
+          Upload foto produk kamu dan biarkan AI membuat gambar promosi yang memukau untuk WA Story
+        </p>
+      </div>
+
+      <div class="generator-container">
+        <!-- Input Panel -->
+        <div class="glass-card generator-panel">
+          <h2>
+            <div class="icon-bg">📤</div>
+            Input Produk
+          </h2>
+
+          <form id="wa-story-form">
+            <!-- Product Photo -->
+            <div class="form-group">
+              <label class="form-label">Foto Produk <span style="color:var(--color-error)">*</span></label>
+              <div class="upload-zone" id="wa-product-zone">
+                <input type="file" id="wa-product-photo" accept="image/*" required>
+                <span class="upload-icon">🍔</span>
+                <div class="upload-text">
+                  <div class="fw-semibold" style="margin-bottom:4px">Klik atau drag foto produk</div>
+                  <div class="text-muted text-sm">JPG, PNG, WebP — max 10MB</div>
+                </div>
+                <img class="upload-preview" alt="Preview produk" style="display:none">
+              </div>
+            </div>
+
+            <!-- Logo (Optional) -->
+            <div class="form-group">
+              <label class="form-label">
+                Logo Usaha
+                <span class="optional">opsional</span>
+              </label>
+              <div class="upload-zone" id="wa-logo-zone">
+                <input type="file" id="wa-logo" accept="image/*">
+                <span class="upload-icon">🏪</span>
+                <div class="upload-text">
+                  <div class="fw-semibold" style="margin-bottom:4px">Upload logo usaha kamu</div>
+                  <div class="text-muted text-sm">Akan diintegrasikan di gambar</div>
+                </div>
+                <img class="upload-preview" alt="Preview logo" style="display:none">
+              </div>
+            </div>
+
+            <!-- Theme -->
+            <div class="form-group">
+              <label class="form-label" for="wa-theme">
+                Tema Promosi
+                <span class="optional">opsional</span>
+              </label>
+              <input class="form-input" type="text" id="wa-theme"
+                placeholder="Contoh: Kemerdekaan Indonesia, Lebaran Idul Fitri, Valentine, Weekend Promo...">
+              <p class="text-xs text-muted mt-sm">Kosongkan jika ingin AI memilih tema yang paling cocok</p>
+            </div>
+
+            <!-- Promo Description -->
+            <div class="form-group">
+              <label class="form-label" for="wa-promo">
+                Deskripsi Promo
+                <span class="optional">opsional</span>
+              </label>
+              <textarea class="form-textarea" id="wa-promo" rows="3"
+                placeholder="Contoh: Diskon 30% untuk pembelian pertama, Beli 2 gratis 1, Gratis ongkir hari ini saja..."></textarea>
+            </div>
+
+            <button type="submit" class="btn generate-btn btn-full">
+              <span>🪄</span> Generate Gambar
+            </button>
+
+            <div class="ai-badge mt-md" style="justify-content:center">
+              <span class="ai-badge-dot"></span>
+              Powered by Google Gemini AI
+            </div>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="glass-card result-panel">
+          <h2>
+            <div class="icon-bg">🖼️</div>
+            Hasil Generate
+          </h2>
+
+          <!-- Placeholder -->
+          <div class="result-placeholder" id="wa-placeholder">
+            <div class="placeholder-icon">🎨</div>
+            <p class="fw-semibold">Gambar promosi kamu akan muncul di sini</p>
+            <p class="text-muted text-sm">Upload foto produk dan klik Generate</p>
+          </div>
+
+          <!-- Image Result -->
+          <div class="result-image-container wa-story hidden" id="wa-image-wrapper">
+            <img id="wa-result-img" class="result-image" alt="Hasil gambar promosi WA Story">
+            <div class="result-image-overlay">
+              <button class="btn btn-secondary btn-sm" onclick="handleDownload('wa_story')">
+                ⬇️ Download
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="result-actions hidden" id="wa-actions">
+            <button class="btn btn-primary" onclick="handleDownload('wa_story')" id="wa-download-btn">
+              ⬇️ Download Gambar
+            </button>
+            <button class="btn btn-secondary" onclick="handleRegenerate('wa_story')">
+              🔄 Generate Ulang
+            </button>
+          </div>
+
+          <!-- Caption -->
+          <div class="caption-box hidden" id="wa-caption-box">
+            <div class="caption-label">
+              💬 Caption WhatsApp Story
+            </div>
+            <p class="caption-text" id="wa-caption-text"></p>
+            <button class="btn btn-secondary btn-sm caption-copy-btn" id="wa-copy-caption"
+              onclick="handleCopyCaption('wa_story')">
+              📋 Salin
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INSTAGRAM TAB ════════════════════════════════════ -->
+    <div class="tab-page hidden" data-tab-content="instagram">
+      <div class="hero-banner" style="padding-top: var(--space-lg)">
+        <div class="hero-badge">
+          <span>📷</span> Instagram Post Format • 3:4
+        </div>
+        <h1 class="hero-title">
+          Generate Promosi<br><span class="highlight">Instagram Post</span>
+        </h1>
+        <p class="hero-subtitle">
+          Buat konten Instagram yang aesthetic dan viral untuk menarik pelanggan baru
+        </p>
+      </div>
+
+      <div class="generator-container">
+        <!-- Input Panel -->
+        <div class="glass-card generator-panel">
+          <h2>
+            <div class="icon-bg">📤</div>
+            Input Produk
+          </h2>
+
+          <form id="instagram-form">
+            <!-- Product Photo -->
+            <div class="form-group">
+              <label class="form-label">Foto Produk <span style="color:var(--color-error)">*</span></label>
+              <div class="upload-zone" id="ig-product-zone">
+                <input type="file" id="ig-product-photo" accept="image/*" required>
+                <span class="upload-icon">🍜</span>
+                <div class="upload-text">
+                  <div class="fw-semibold" style="margin-bottom:4px">Klik atau drag foto produk</div>
+                  <div class="text-muted text-sm">JPG, PNG, WebP — max 10MB</div>
+                </div>
+                <img class="upload-preview" alt="Preview produk" style="display:none">
+              </div>
+            </div>
+
+            <!-- Logo (Optional) -->
+            <div class="form-group">
+              <label class="form-label">
+                Logo Usaha
+                <span class="optional">opsional</span>
+              </label>
+              <div class="upload-zone" id="ig-logo-zone">
+                <input type="file" id="ig-logo" accept="image/*">
+                <span class="upload-icon">🏪</span>
+                <div class="upload-text">
+                  <div class="fw-semibold" style="margin-bottom:4px">Upload logo usaha kamu</div>
+                  <div class="text-muted text-sm">Akan diintegrasikan di gambar</div>
+                </div>
+                <img class="upload-preview" alt="Preview logo" style="display:none">
+              </div>
+            </div>
+
+            <!-- Theme -->
+            <div class="form-group">
+              <label class="form-label" for="ig-theme">
+                Tema Promosi
+                <span class="optional">opsional</span>
+              </label>
+              <input class="form-input" type="text" id="ig-theme"
+                placeholder="Contoh: Summer vibes, Aesthetic Korean, Minimalist, Ramadan Special...">
+              <p class="text-xs text-muted mt-sm">Kosongkan jika ingin AI memilih tema yang paling cocok</p>
+            </div>
+
+            <!-- Promo Description -->
+            <div class="form-group">
+              <label class="form-label" for="ig-promo">
+                Deskripsi Promo
+                <span class="optional">opsional</span>
+              </label>
+              <textarea class="form-textarea" id="ig-promo" rows="3"
+                placeholder="Contoh: Flash sale 50% setiap hari Jumat, Menu baru hadir!, Open pre-order sekarang..."></textarea>
+            </div>
+
+            <button type="submit" class="btn generate-btn btn-full">
+              <span>🪄</span> Generate Gambar
+            </button>
+
+            <div class="ai-badge mt-md" style="justify-content:center">
+              <span class="ai-badge-dot"></span>
+              Powered by Google Gemini AI
+            </div>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="glass-card result-panel">
+          <h2>
+            <div class="icon-bg">🖼️</div>
+            Hasil Generate
+          </h2>
+
+          <!-- Placeholder -->
+          <div class="result-placeholder" id="ig-placeholder">
+            <div class="placeholder-icon">✨</div>
+            <p class="fw-semibold">Gambar promosi kamu akan muncul di sini</p>
+            <p class="text-muted text-sm">Upload foto produk dan klik Generate</p>
+          </div>
+
+          <!-- Image Result -->
+          <div class="result-image-container instagram hidden" id="ig-image-wrapper">
+            <img id="ig-result-img" class="result-image" alt="Hasil gambar promosi Instagram">
+            <div class="result-image-overlay">
+              <button class="btn btn-secondary btn-sm" onclick="handleDownload('instagram')">
+                ⬇️ Download
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="result-actions hidden" id="ig-actions">
+            <button class="btn btn-primary" onclick="handleDownload('instagram')" id="ig-download-btn">
+              ⬇️ Download Gambar
+            </button>
+            <button class="btn btn-secondary" onclick="handleRegenerate('instagram')">
+              🔄 Generate Ulang
+            </button>
+          </div>
+
+          <!-- Caption -->
+          <div class="caption-box hidden" id="ig-caption-box">
+            <div class="caption-label">
+              ✍️ Caption Instagram Post
+            </div>
+            <p class="caption-text" id="ig-caption-text"></p>
+            <button class="btn btn-secondary btn-sm caption-copy-btn" id="ig-copy-caption"
+              onclick="handleCopyCaption('instagram')">
+              📋 Salin
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FEEDBACK TAB ═════════════════════════════════════ -->
+    <div class="tab-page hidden" data-tab-content="feedback">
+      <div class="feedback-container">
+        <div class="hero-banner" style="padding-top: var(--space-lg); text-align:left;">
+          <div class="hero-badge">
+            <span>💌</span> Kotak Saran
+          </div>
+          <h1 class="hero-title" style="font-size: var(--text-3xl)">
+            Saran & <span class="highlight">Masukan</span>
+          </h1>
+          <p class="hero-subtitle" style="margin:0;text-align:left">
+            Bantu kami berkembang dengan saran dan masukan kamu. Setiap feedback sangat berarti! 🙏
+          </p>
+        </div>
+
+        <div class="glass-card" style="padding: var(--space-xl); margin-top: var(--space-lg)">
+          <div class="alert alert-success hidden" id="feedback-success">
+            ✅ Pesan kamu berhasil terkirim! Terima kasih sudah memberikan masukan.
+          </div>
+          <div class="alert alert-error hidden" id="feedback-error-wrapper">
+            <span>⚠️</span><span id="feedback-error"></span>
+          </div>
+
+          <form id="feedback-form">
+            <div class="form-group">
+              <label class="form-label" for="feedback-subject">Subjek / Judul</label>
+              <input class="form-input" type="text" id="feedback-subject"
+                placeholder="Contoh: Saran fitur baru, Bug yang ditemukan, Kritik desain...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="feedback-message">
+                Pesan <span style="color:var(--color-error)">*</span>
+              </label>
+              <textarea class="form-textarea" id="feedback-message" rows="6" required
+                placeholder="Tulis saran, masukan, atau laporan bug kamu di sini...&#10;&#10;Contoh:&#10;- Saya ingin ada fitur untuk generate caption secara manual&#10;- Tombol download tidak berfungsi di Safari&#10;- Mohon tambahkan template desain yang lebih bervariasi"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg">
+              📨 Kirim Pesan
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation -->
+  <div class="nav-tabs-mobile">
+    <button class="nav-tab active" data-tab="wa-story">
+      <span>📱</span> WA Story
+    </button>
+    <button class="nav-tab" data-tab="instagram">
+      <span>📷</span> Instagram
+    </button>
+    <button class="nav-tab" data-tab="feedback">
+      <span>💌</span> Saran
+    </button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- API KEY MODAL                                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="api-key-modal" onclick="if(event.target===this)closeApiKeyModal()">
+  <div class="glass-card modal">
+    <div class="modal-header">
+      <h2 class="modal-title">🔑 Kelola API Key</h2>
+      <button class="modal-close" onclick="closeApiKeyModal()">✕</button>
+    </div>
+
+    <div class="alert alert-info mb-md">
+      <span>💡</span>
+      <span>API Key Gemini kamu disimpan dengan aman dan hanya digunakan untuk generate gambar.</span>
+    </div>
+
+    <div style="margin-bottom: var(--space-md); padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+      <p class="text-sm text-secondary">Dapatkan API Key gratis di:</p>
+      <a href="https://aistudio.google.com/app/apikey" target="_blank"
+        style="color: var(--color-gold); font-weight:600; font-size: var(--text-sm);">
+        → aistudio.google.com/app/apikey
+      </a>
+    </div>
+
+    <form id="api-key-form">
+      <div class="form-group">
+        <label class="form-label" for="new-api-key">Gemini API Key</label>
+        <div class="password-input-wrapper">
+          <input class="form-input" type="password" id="new-api-key" placeholder="AIza..." autocomplete="off" required>
+          <button type="button" class="password-toggle" onclick="
+            const inp = document.getElementById('new-api-key');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+          ">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </button>
+        </div>
+        <p class="text-xs text-muted mt-sm">API Key akan divalidasi sebelum disimpan</p>
+      </div>
+
+      <div style="display:flex; gap: 12px;">
+        <button type="button" class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex:1">
+          Batal
+        </button>
+        <button type="submit" class="btn btn-primary" style="flex:2">
+          ✅ Simpan & Validasi
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/js/storage.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/gemini.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/generator.js"></script>
+
+<script>
+// Handle initial page load
+window.addEventListener('load', async () => {
+  const loadingScreen = document.getElementById('loading-screen');
+
+  if (Auth.isLoggedIn()) {
+    showDashboard();
+  } else {
+    showAuthPage();
+  }
+
+  // Hide loading after brief delay
+  setTimeout(() => {
+    loadingScreen?.classList.add('hide');
+  }, 300);
+
+  // Load app settings for favicon/logo
+  loadAppSettings();
+});
+</script>
+
+</body>
+</html>
