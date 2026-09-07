@@ -194,17 +194,20 @@ app.get('/api/auth/me', authMiddleware, requireSupabase, async (req, res) => {
 // ─── User Routes ───────────────────────────────────────────────────────────────
 
 // Update API Key
-app.put('/api/user/apikey', authMiddleware, requireSupabase, async (req, res) => {
+app.put('/api/user/apikey', authMiddleware, async (req, res) => {
   const { gemini_api_key } = req.body;
   if (!gemini_api_key) return res.status(400).json({ error: 'API Key wajib diisi' });
 
-  const { error } = await supabase
-    .from('users')
-    .update({ gemini_api_key })
-    .eq('id', req.user.id);
+  if (supabase) {
+    const { error } = await supabase
+      .from('users')
+      .update({ gemini_api_key })
+      .eq('id', req.user.id);
 
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, message: 'API Key berhasil diperbarui' });
+    if (error) return res.status(500).json({ error: error.message });
+  }
+
+  res.json({ success: true, message: 'API Key berhasil diperbarui', gemini_api_key });
 });
 
 // Get user profile

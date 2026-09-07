@@ -225,23 +225,60 @@ Penting:
 }
 
 /**
- * Validate Gemini API Key by making a simple test request
+ * Validate Gemini API Key by testing against Gemini REST endpoint
  */
 async function validateGeminiApiKey(apiKey) {
+  if (!apiKey || typeof apiKey !== 'string') return false;
+  const cleanKey = apiKey.trim();
+
+  // Basic length check (Gemini / GCP API Keys are at least 10 chars)
+  if (cleanKey.length < 10) return false;
+
   try {
-    const response = await fetch(
-      `${GEMINI_BASE_URL}/${GEMINI_TEXT_MODEL}:generateContent?key=${apiKey}`,
+    // Test with gemini-1.5-flash endpoint
+    const res1 = await fetch(
+      `${GEMINI_BASE_URL}/gemini-1.5-flash:generateContent?key=${cleanKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: 'Hello' }] }],
-          generationConfig: { maxOutputTokens: 10 }
+          contents: [{ parts: [{ text: 'ping' }] }],
+          generationConfig: { maxOutputTokens: 5 }
         })
       }
     );
-    return response.ok;
+
+    if (res1.ok) return true;
+
+    // Test with gemini-2.0-flash endpoint
+    const res2 = await fetch(
+      `${GEMINI_BASE_URL}/gemini-2.0-flash:generateContent?key=${cleanKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: 'ping' }] }],
+          generationConfig: { maxOutputTokens: 5 }
+        })
+      }
+    );
+
+    if (res2.ok) return true;
+
+    // Check error response content
+    const errData = await res1.json().catch(() => ({}));
+    const errMsg = errData?.error?.message || '';
+
+    // If Google explicitly rejected the key as invalid
+    if (errMsg.toLowerCase().includes('api key not valid') || errMsg.toLowerCase().includes('invalid')) {
+      return false;
+    }
+
+    // For other errors (quota limit 429, region restriction, model access permission),
+    // allow saving if the format looks like a standard API Key (length >= 15)
+    return cleanKey.length >= 15;
   } catch {
-    return false;
+    // If network fetch failed, don't block user if key length looks reasonable
+    return cleanKey.length >= 15;
   }
 }

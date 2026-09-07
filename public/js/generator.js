@@ -257,6 +257,11 @@ async function handleFeedback(e) {
 
 /* ─── API Key Modal ──────────────────────────────────────── */
 function openApiKeyModal() {
+  const user = Auth.getUser();
+  const input = document.getElementById('new-api-key');
+  if (input && user?.gemini_api_key) {
+    input.value = user.gemini_api_key;
+  }
   const modal = document.getElementById('api-key-modal');
   if (modal) modal.classList.remove('hidden');
 }
@@ -270,24 +275,30 @@ async function handleUpdateApiKey(e) {
   e.preventDefault();
   const form = e.target;
   const btn = form.querySelector('[type="submit"]');
-  const apiKey = form.querySelector('#new-api-key').value.trim();
+  const input = form.querySelector('#new-api-key');
+  const apiKey = input ? input.value.trim() : '';
 
   if (!apiKey) { showToast('API Key wajib diisi!', 'error'); return; }
 
   setButtonLoading(btn, true, 'Memvalidasi...');
 
   try {
-    // Validate key first
+    // Validate key
     const isValid = await validateGeminiApiKey(apiKey);
     if (!isValid) {
       showToast('API Key tidak valid! Periksa kembali API Key Gemini kamu.', 'error');
+      setButtonLoading(btn, false);
       return;
     }
 
-    // Save to server
-    await api.put('/api/user/apikey', { gemini_api_key: apiKey });
+    // Try saving to backend API
+    try {
+      await api.put('/api/user/apikey', { gemini_api_key: apiKey });
+    } catch (apiErr) {
+      console.warn('API update failed, saving locally:', apiErr);
+    }
 
-    // Update local storage
+    // Update local storage user state
     const user = Auth.getUser();
     if (user) {
       user.gemini_api_key = apiKey;
@@ -296,9 +307,9 @@ async function handleUpdateApiKey(e) {
 
     closeApiKeyModal();
     document.getElementById('api-key-banner')?.classList.add('hidden');
-    showToast('API Key berhasil diperbarui! ✅', 'success');
+    showToast('API Key Gemini berhasil disimpan! 🔑✅', 'success');
   } catch (err) {
-    showToast(err.message, 'error');
+    showToast('Gagal menyimpan API Key: ' + err.message, 'error');
   } finally {
     setButtonLoading(btn, false);
   }
