@@ -274,25 +274,25 @@
                 <input type="file" id="wa-product-photo" accept="image/*" required>
                 <span class="upload-icon">🍔</span>
                 <div class="upload-text">
-                  <div class="fw-semibold" style="margin-bottom:4px">Klik atau drag foto produk</div>
-                  <div class="text-muted text-sm">JPG, PNG, WebP — max 10MB</div>
+                  <div class="fw-semibold" style="margin-bottom:4px">Upload Foto Produk</div>
+                  <div class="text-muted text-sm">Upload foto produk yang akan dipromosikan (JPG, PNG, WebP)</div>
                 </div>
                 <img class="upload-preview" alt="Preview produk" style="display:none">
               </div>
             </div>
 
-            <!-- Logo (Optional) -->
+            <!-- Logo Brand (Optional) -->
             <div class="form-group">
               <label class="form-label">
-                Logo Usaha
+                Logo Brand
                 <span class="optional">opsional</span>
               </label>
               <div class="upload-zone" id="wa-logo-zone">
                 <input type="file" id="wa-logo" accept="image/*">
                 <span class="upload-icon">🏪</span>
                 <div class="upload-text">
-                  <div class="fw-semibold" style="margin-bottom:4px">Upload logo usaha kamu</div>
-                  <div class="text-muted text-sm">Akan diintegrasikan di gambar</div>
+                  <div class="fw-semibold" style="margin-bottom:4px">Upload Logo Brand</div>
+                  <div class="text-muted text-sm">Gunakan logo asli sebagai identitas brand</div>
                 </div>
                 <img class="upload-preview" alt="Preview logo" style="display:none">
               </div>
@@ -305,27 +305,36 @@
                 <span class="optional">opsional</span>
               </label>
               <input class="form-input" type="text" id="wa-theme"
-                placeholder="Contoh: Kemerdekaan Indonesia, Lebaran Idul Fitri, Valentine, Weekend Promo...">
-              <p class="text-xs text-muted mt-sm">Kosongkan jika ingin AI memilih tema yang paling cocok</p>
+                placeholder="Contoh: promo sarapan praktis, menu keluarga, promo weekend">
+              <p class="text-xs text-muted mt-sm">Opsional. Jika kosong, AI menentukan tema promosi yang paling relevan dengan produk.</p>
             </div>
 
-            <!-- Promo Description -->
+            <!-- Promotional Copy -->
             <div class="form-group">
               <label class="form-label" for="wa-promo">
-                Deskripsi Promo
+                Kalimat Promosi
                 <span class="optional">opsional</span>
               </label>
               <textarea class="form-textarea" id="wa-promo" rows="3"
-                placeholder="Contoh: Diskon 30% untuk pembelian pertama, Beli 2 gratis 1, Gratis ongkir hari ini saja..."></textarea>
+                placeholder="Masukkan kalimat promosi. Kosongkan jika ingin AI yang menentukan."></textarea>
+              <p class="text-xs text-muted mt-sm">Opsional. AI boleh memperbaiki kalimat tetapi wajib mempertahankan makna dan tujuan promosi.</p>
+            </div>
+
+            <!-- Generate Caption Option -->
+            <div class="form-group" style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+              <input type="checkbox" id="wa-gen-caption" checked style="width:18px; height:18px; accent-color:var(--color-primary); cursor:pointer;">
+              <label for="wa-gen-caption" style="cursor:pointer; font-weight:500; font-size:var(--text-sm); user-select:none;">
+                Generate Caption (Otomatis buat caption promosi)
+              </label>
             </div>
 
             <button type="submit" class="btn generate-btn btn-full">
-              <span>🪄</span> Generate Gambar
+              <span>🪄</span> Generate Promosi (Google Nano Banana v5.0)
             </button>
 
             <div class="ai-badge mt-md" style="justify-content:center">
               <span class="ai-badge-dot"></span>
-              Powered by Google Gemini AI
+              Powered by Google Nano Banana / Gemini AI v5.0
             </div>
           </form>
         </div>
@@ -409,25 +418,25 @@
                 <input type="file" id="ig-product-photo" accept="image/*" required>
                 <span class="upload-icon">🍜</span>
                 <div class="upload-text">
-                  <div class="fw-semibold" style="margin-bottom:4px">Klik atau drag foto produk</div>
-                  <div class="text-muted text-sm">JPG, PNG, WebP — max 10MB</div>
+                  <div class="fw-semibold" style="margin-bottom:4px">Upload Foto Produk</div>
+                  <div class="text-muted text-sm">Upload foto produk yang akan dipromosikan (JPG, PNG, WebP)</div>
                 </div>
                 <img class="upload-preview" alt="Preview produk" style="display:none">
               </div>
             </div>
 
-            <!-- Logo (Optional) -->
+            <!-- Logo Brand (Optional) -->
             <div class="form-group">
               <label class="form-label">
-                Logo Usaha
+                Logo Brand
                 <span class="optional">opsional</span>
               </label>
               <div class="upload-zone" id="ig-logo-zone">
                 <input type="file" id="ig-logo" accept="image/*">
                 <span class="upload-icon">🏪</span>
                 <div class="upload-text">
-                  <div class="fw-semibold" style="margin-bottom:4px">Upload logo usaha kamu</div>
-                  <div class="text-muted text-sm">Akan diintegrasikan di gambar</div>
+                  <div class="fw-semibold" style="margin-bottom:4px">Upload Logo Brand</div>
+                  <div class="text-muted text-sm">Gunakan logo asli sebagai identitas brand</div>
                 </div>
                 <img class="upload-preview" alt="Preview logo" style="display:none">
               </div>
@@ -440,27 +449,36 @@
                 <span class="optional">opsional</span>
               </label>
               <input class="form-input" type="text" id="ig-theme"
-                placeholder="Contoh: Summer vibes, Aesthetic Korean, Minimalist, Ramadan Special...">
-              <p class="text-xs text-muted mt-sm">Kosongkan jika ingin AI memilih tema yang paling cocok</p>
+                placeholder="Contoh: promo sarapan praktis, menu keluarga, promo weekend">
+              <p class="text-xs text-muted mt-sm">Opsional. Jika kosong, AI menentukan tema promosi yang paling relevan dengan produk.</p>
             </div>
 
-            <!-- Promo Description -->
+            <!-- Promotional Copy -->
             <div class="form-group">
               <label class="form-label" for="ig-promo">
-                Deskripsi Promo
+                Kalimat Promosi
                 <span class="optional">opsional</span>
               </label>
               <textarea class="form-textarea" id="ig-promo" rows="3"
-                placeholder="Contoh: Flash sale 50% setiap hari Jumat, Menu baru hadir!, Open pre-order sekarang..."></textarea>
+                placeholder="Masukkan kalimat promosi. Kosongkan jika ingin AI yang menentukan."></textarea>
+              <p class="text-xs text-muted mt-sm">Opsional. AI boleh memperbaiki kalimat tetapi wajib mempertahankan makna dan tujuan promosi.</p>
+            </div>
+
+            <!-- Generate Caption Option -->
+            <div class="form-group" style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+              <input type="checkbox" id="ig-gen-caption" checked style="width:18px; height:18px; accent-color:var(--color-primary); cursor:pointer;">
+              <label for="ig-gen-caption" style="cursor:pointer; font-weight:500; font-size:var(--text-sm); user-select:none;">
+                Generate Caption (Otomatis buat caption promosi)
+              </label>
             </div>
 
             <button type="submit" class="btn generate-btn btn-full">
-              <span>🪄</span> Generate Gambar
+              <span>🪄</span> Generate Promosi (Google Nano Banana v5.0)
             </button>
 
             <div class="ai-badge mt-md" style="justify-content:center">
               <span class="ai-badge-dot"></span>
-              Powered by Google Gemini AI
+              Powered by Google Nano Banana / Gemini AI v5.0
             </div>
           </form>
         </div>

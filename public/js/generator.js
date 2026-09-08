@@ -102,6 +102,7 @@ async function handleGenerate(e, platform) {
   const logoInput = document.getElementById(`${prefix}-logo`);
   const themeInput = document.getElementById(`${prefix}-theme`);
   const promoInput = document.getElementById(`${prefix}-promo`);
+  const genCaptionInput = document.getElementById(`${prefix}-gen-caption`);
 
   const productFile = productInput?.files?.[0];
   if (!productFile) {
@@ -112,6 +113,7 @@ async function handleGenerate(e, platform) {
   const logoFile = logoInput?.files?.[0] || null;
   const theme = themeInput?.value?.trim() || '';
   const promo = promoInput?.value?.trim() || '';
+  const generateCaptionBool = genCaptionInput ? genCaptionInput.checked : true;
 
   // Show generating state
   const resultArea = document.getElementById(`${prefix}-result`);
@@ -128,8 +130,8 @@ async function handleGenerate(e, platform) {
         <div class="shimmer" style="width:160px;height:12px;margin:0 auto 8px"></div>
         <div class="shimmer" style="width:140px;height:12px;margin:0 auto"></div>
         <p style="margin-top:20px;color:var(--color-text-muted);font-size:var(--text-sm)">
-          AI sedang membuat gambar promosi kamu...<br>
-          <span style="font-size:var(--text-xs)">Proses ini membutuhkan 15-30 detik</span>
+          AI (Google Nano Banana v5.0) sedang memproses foto produk kamu...<br>
+          <span style="font-size:var(--text-xs)">Mengunci identitas produk & menerapkan gaya komersial...</span>
         </p>
       </div>
     `;
@@ -149,13 +151,15 @@ async function handleGenerate(e, platform) {
   `;
 
   try {
-    // Generate image
-    const { imageBase64, mimeType } = await generatePromotionalImage(
+    // Generate image using Google Nano Banana v5.0 Prompt Rules
+    const { imageBase64, mimeType, visualConcept } = await generatePromotionalImage(
       user.gemini_api_key, productFile, logoFile, theme, promo, platform
     );
 
     // Generate caption with Gemini Vision analyzing the product photo
-    const caption = await generateCaption(user.gemini_api_key, productFile, theme, promo, platform);
+    const caption = await generateCaption(
+      user.gemini_api_key, productFile, logoFile, theme, promo, platform, generateCaptionBool
+    );
 
     // Store results
     currentGeneratedImage = { imageBase64, mimeType };
@@ -170,15 +174,17 @@ async function handleGenerate(e, platform) {
         if (resultPlaceholder) resultPlaceholder.classList.add('hidden');
         if (resultImageWrapper) resultImageWrapper.classList.remove('hidden');
         if (resultActionsEl) resultActionsEl.classList.remove('hidden');
-        if (captionBoxEl) captionBoxEl.classList.remove('hidden');
+        if (caption && captionBoxEl) captionBoxEl.classList.remove('hidden');
       };
     }
 
-    // Show caption
+    // Show caption if enabled
     const captionTextEl = document.getElementById(`${prefix}-caption-text`);
-    if (captionTextEl) captionTextEl.textContent = caption;
+    if (captionTextEl && caption) {
+      captionTextEl.textContent = caption;
+    }
 
-    showToast('Gambar promosi berhasil dibuat! 🎨', 'success');
+    showToast('Gambar promosi berhasil dibuat dengan AI Food Promotion v5.0! 🎨', 'success');
   } catch (err) {
     if (resultPlaceholder) {
       resultPlaceholder.innerHTML = `
