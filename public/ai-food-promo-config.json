@@ -1,0 +1,173 @@
+{
+  "name": "AI Food Promotion Generator",
+  "version": "5.0",
+  "language": "id-ID",
+
+  "inputs": {
+    "product_image": {
+      "type": "image",
+      "required": true,
+      "label": "Foto Produk",
+      "description": "Upload foto produk yang akan dipromosikan."
+    },
+
+    "promotion_theme": {
+      "type": "text",
+      "required": false,
+      "label": "Tema Promosi",
+      "placeholder": "Contoh: promo sarapan praktis, menu keluarga, promo weekend",
+      "description": "Opsional. Jika kosong, AI menentukan tema promosi yang paling relevan dengan produk."
+    },
+
+    "promotional_copy": {
+      "type": "textarea",
+      "required": false,
+      "label": "Kalimat Promosi",
+      "placeholder": "Masukkan kalimat promosi. Kosongkan jika ingin AI yang menentukan.",
+      "description": "Opsional. AI boleh memperbaiki kalimat tetapi wajib mempertahankan makna dan tujuan promosi."
+    },
+
+    "brand_logo": {
+      "type": "image",
+      "required": false,
+      "label": "Logo Brand",
+      "description": "Opsional. Jika diberikan, gunakan logo asli sebagai identitas brand tanpa mendesain ulang."
+    },
+
+    "generate_caption": {
+      "type": "boolean",
+      "required": false,
+      "label": "Generate Caption",
+      "default": true
+    }
+  },
+
+  "priority_logic": {
+    "product_identity": 1,
+    "promotional_copy": 2,
+    "promotion_theme": 3,
+    "ai_creativity": 4
+  },
+
+  "image_generator": {
+    "enabled": true,
+
+    "output": {
+      "aspect_ratio": "9:16",
+      "orientation": "vertical",
+      "use_case": "WhatsApp Story",
+      "style": "premium commercial food advertising",
+      "quality": "professional"
+    },
+
+    "prompt": "Create a premium professional vertical 9:16 promotional advertisement using the uploaded PRODUCT IMAGE as the exact physical product identity reference.\n\nIMPORTANT INPUT ROLES:\nPRODUCT IMAGE determines WHAT THE PRODUCT IS.\nPROMOTION THEME determines WHAT THE CAMPAIGN IS ABOUT.\nPROMOTIONAL COPY determines WHAT MESSAGE SHOULD BE COMMUNICATED.\nBRAND LOGO determines WHAT BRAND IDENTITY SHOULD BE SHOWN.\nAI controls CAMERA ANGLE, PHOTOGRAPHY, LIGHTING, BACKGROUND, ENVIRONMENT, COMPOSITION, TYPOGRAPHY, GRAPHIC DESIGN, AND VISUAL STORYTELLING.\n\n==================================================\n1. STRICT PRODUCT IDENTITY LOCK\n==================================================\n\nThe uploaded PRODUCT IMAGE is an exact physical product identity reference.\n\nPreserve the exact identity of the real product, including:\n- product type\n- product shape\n- physical dimensions\n- proportions\n- packaging\n- bottle, box, wrapper, container, plate, or other physical form\n- brand name\n- product logo\n- label\n- printed text\n- graphics\n- product colors\n- material\n- cap\n- lid\n- seal\n- handle\n- nozzle\n- closure\n- distinctive physical characteristics\n\nThe final image MUST show the SAME PRODUCT.\n\nDO NOT redesign the product.\nDO NOT recreate it as another product.\nDO NOT replace it with a similar product.\nDO NOT simplify it.\nDO NOT stylize it.\nDO NOT modernize it.\nDO NOT change the packaging.\nDO NOT change the product color.\nDO NOT change the proportions.\nDO NOT invent a different label.\nDO NOT invent a different brand.\nDO NOT remove important product details.\nDO NOT hallucinate product characteristics.\n\nThe product must remain immediately recognizable as the exact same physical product from the uploaded reference.\n\n==================================================\n2. CAMERA ANGLE FREEDOM\n==================================================\n\nThe uploaded photo is NOT a composition reference.\nDo NOT simply reproduce the original photograph.\n\nTreat the uploaded image as if it were a professional product reference photograph.\nImagine taking the EXACT SAME physical product and photographing it again with a professional commercial camera from a better and more creative angle.\n\nThe AI has FULL CREATIVE FREEDOM to change:\n- camera position\n- camera height\n- camera distance\n- viewing angle\n- perspective\n- lens perspective\n- focal length appearance\n- framing\n- crop\n- depth of field\n- product placement\n- physically plausible product rotation\n- foreground/background relationship\n- lighting direction\n- shadow direction\n- reflections\n- environmental context\n\nCORE PRINCIPLE:\nMOVE THE CAMERA, NOT THE PRODUCT IDENTITY.\n\nThe goal is to create a fresh professional commercial photograph of the SAME PRODUCT, not a copy of the original photo.\n\n==================================================\n3. PHYSICAL REALISM\n==================================================\n\nTreat the product as a real physical object.\n\nMaintain:\n- realistic geometry\n- physically plausible perspective\n- correct proportions\n- realistic contact with surfaces\n- realistic shadows\n- realistic reflections\n- realistic materials\n- realistic depth\n- believable lighting\n\nIf some parts of the product are hidden in the reference image, do not invent detailed branding, text, labels, or packaging for those hidden areas.\n\n==================================================\n4. PREMIUM FOOD PHOTOGRAPHY\n==================================================\n\nCreate high-end commercial food photography suitable for professional advertising.\n\nUse appropriate combinations of:\n- cinematic lighting\n- professional studio lighting\n- premium food photography lighting\n- realistic highlights\n- realistic shadows\n- realistic reflections\n- natural textures\n- dimensional lighting\n- realistic depth of field\n- premium lens perspective\n- appetizing presentation\n- polished commercial photography\n\nWhen relevant to the actual product, the AI may creatively add:\n- fresh ingredients\n- herbs\n- spices\n- sauce\n- crumbs\n- steam\n- fresh food\n- serving plates\n- utensils\n- cooking surfaces\n- subtle food particles\n- realistic kitchen elements\n\nOnly add elements that are logically relevant to the actual product.\nDo not add unrelated objects.\n\n==================================================\n5. BACKGROUND AND ENVIRONMENT\n==================================================\n\nThe AI has creative freedom to choose the most suitable premium environment.\n\nPossible environments include:\n- premium modern kitchen\n- elegant tabletop\n- restaurant environment\n- clean studio\n- warm food photography setup\n- modern kitchen counter\n- editorial food photography\n- lifestyle dining scene\n- premium commercial advertising environment\n\nChoose the environment based on the actual product and promotion theme.\n\nThe environment must support the product and must never overpower it.\n\n==================================================\n6. PROMOTION THEME\n==================================================\n\nIf PROMOTION THEME is provided:\n- Follow it as the main campaign concept.\n- Build the visual mood around it.\n- Adapt the environment, styling, composition, colors, and graphic design to the theme.\n- Never change the actual product.\n\nIf PROMOTION THEME is empty:\n- Determine the most commercially relevant theme based on the actual product.\n- Choose a theme that naturally creates curiosity and purchase interest.\n\n==================================================\n7. PROMOTIONAL COPY\n==================================================\n\nIf PROMOTIONAL COPY is provided:\n- Treat it as high-priority information.\n- Preserve its original meaning.\n- Preserve its promotional intent.\n- Preserve the actual offer.\n- Improve grammar when necessary.\n- Improve readability.\n- Improve persuasion.\n- Improve sentence structure.\n- Improve emotional impact.\n- Improve typography hierarchy.\n\nThe improved wording MUST remain correlated with the original user input.\n\nDO NOT invent:\n- different prices\n- different discounts\n- different deadlines\n- different offers\n- unsupported benefits\n- guarantees\n- new claims\n- a different promotional meaning\n\nIf PROMOTIONAL COPY is empty:\n- Generate suitable promotional copy based on the actual product and promotion theme.\n\n==================================================\n8. CURIOSITY HOOK\n==================================================\n\nCreate ONE original Indonesian curiosity-driven hook.\n\nMaximum 8 words.\n\nThe hook must:\n- relate directly to the actual product\n- create curiosity\n- create an information gap\n- make people want to know more\n- feel natural\n- be suitable for social media\n\nPsychological direction examples:\n- Kenapa yang ini cepat habis?\n- Ternyata ini rahasianya...\n- Kok bisa seenak ini?\n- Yang tahu ini pasti suka\n\nAvoid generic hooks such as:\n- PROMO TERBAIK\n- HARGA MURAH\n- DISKON BESAR\n- BURUAN BELI\n\nunless the user explicitly provides that type of message.\n\nDo not use misleading clickbait.\n\n==================================================\n9. BRAND LOGO LOCK\n==================================================\n\nIf BRAND LOGO is provided:\n- MUST include the exact uploaded logo.\n- Use it as the official brand identity.\n- Preserve the original symbol.\n- Preserve original typography.\n- Preserve proportions.\n- Preserve colors.\n- Preserve visual identity.\n\nDO NOT:\n- redesign the logo\n- redraw the logo\n- replace the logo\n- create another logo\n- distort the logo\n- change its colors\n- change its typography\n\nPlace the logo naturally in a premium location such as:\n- top corner\n- top center\n- bottom corner\n- subtle brand badge\n- clean header area\n\nThe logo should be visible but should not overpower the product.\n\nIf BRAND LOGO is absent:\nDO NOT invent a logo.\n\n==================================================\n10. TYPOGRAPHY\n==================================================\n\nCreate attractive, modern, premium promotional typography.\n\nUse:\n- bold display typography for the main hook\n- modern clean sans-serif typography for supporting text\n- strong readable typography for CTA\n- clear hierarchy\n- attractive spacing\n- smartphone-friendly sizing\n\nPossible typography treatments:\n- oversized headline\n- highlighted keywords\n- outlined keywords\n- subtle shadows\n- gradient accents\n- text inside shapes\n- layered typography\n- accent underline\n- contrasting font weights\n\nTypography must be highly readable on a smartphone screen.\n\n==================================================\n11. GRAPHIC DESIGN\n==================================================\n\nCreate sophisticated social media advertising graphic design.\n\nPossible elements:\n- dynamic geometric shapes\n- organic shapes\n- abstract curves\n- gradients\n- decorative lines\n- premium badges\n- subtle glow\n- visual framing\n- editorial elements\n- subtle patterns\n- elegant separators\n- modern visual accents\n\nUse graphic elements to strengthen the advertising composition.\n\nDO NOT clutter the image.\nDO NOT cover the product.\nDO NOT make the design look amateurish.\n\n==================================================\n12. COLOR SYSTEM\n==================================================\n\nAnalyze the actual PRODUCT IMAGE and BRAND LOGO when available.\n\nBuild a cohesive visual color palette using:\n- colors naturally present in the product\n- brand colors\n- complementary colors\n- tasteful contrasting accents\n- neutral support colors\n\nThe background and graphic design may use creative colors.\n\nNEVER change the actual product colors.\nNEVER change the actual brand logo colors.\n\n==================================================\n13. COMPOSITION\n==================================================\n\nCreate a strong vertical 9:16 composition optimized for smartphone viewing and WhatsApp Story.\n\nThe product must remain the visual hero.\n\nA possible hierarchy is:\n1. Brand Logo\n2. Curiosity Hook\n3. Hero Product\n4. Supporting Promotional Message\n5. CTA\n\nHowever, the AI may change the hierarchy when a better commercial composition is appropriate.\n\nUse:\n- balanced negative space\n- strong focal point\n- clear typography hierarchy\n- professional alignment\n- premium visual rhythm\n- natural visual flow\n\n==================================================\n14. FINAL QUALITY CONTROL\n==================================================\n\nBefore finalizing the image, compare the generated product against PRODUCT IMAGE.\n\nVerify:\n- SAME product\n- SAME packaging\n- SAME shape\n- SAME proportions\n- SAME brand\n- SAME label\n- SAME product logo\n- SAME product colors\n- SAME distinctive physical details\n\nIf unnecessary product modifications occurred, correct them before finalizing.\n\nFINAL RULE:\n\nPRODUCT IMAGE = WHAT PRODUCT\nPROMOTION THEME = WHAT CAMPAIGN\nPROMOTIONAL COPY = WHAT MESSAGE\nBRAND LOGO = WHAT BRAND\nAI = CAMERA + PHOTOGRAPHY + LIGHTING + BACKGROUND + COMPOSITION + TYPOGRAPHY + GRAPHIC DESIGN\n\nNEVER CHANGE THE ACTUAL PRODUCT.",
+
+    "variables": {
+      "PRODUCT_IMAGE": "{{PRODUCT_IMAGE}}",
+      "PROMOTION_THEME": "{{PROMOTION_THEME}}",
+      "PROMOTIONAL_COPY": "{{PROMOTIONAL_COPY}}",
+      "BRAND_LOGO": "{{BRAND_LOGO}}"
+    },
+
+    "negative_rules": [
+      "Do not change product identity",
+      "Do not redesign product packaging",
+      "Do not replace the product",
+      "Do not create a similar product",
+      "Do not change product colors",
+      "Do not change product proportions",
+      "Do not change product labels",
+      "Do not invent product branding",
+      "Do not distort brand logo",
+      "Do not copy the original photo composition",
+      "Do not create unrelated environments",
+      "Do not clutter the composition",
+      "Do not cover the product with text",
+      "Do not invent unsupported promotional claims"
+    ]
+  },
+
+  "caption_generator": {
+    "enabled": true,
+
+    "prompt": "Generate ONE ready-to-publish promotional caption in natural Indonesian based on the actual PRODUCT IMAGE.\n\nINPUT PRIORITY:\n1. PRODUCT IMAGE\n2. PROMOTIONAL COPY\n3. PROMOTION THEME\n4. AI CREATIVE INTERPRETATION\n\nThe caption MUST be directly related to the actual product shown in PRODUCT IMAGE.\n\n==================================================\n1. CAPTION OBJECTIVE\n==================================================\n\nCreate a caption that is:\n- simple\n- persuasive\n- conversational\n- natural\n- curiosity-driven\n- emotionally engaging\n- product-specific\n- suitable for WhatsApp\n- suitable for social media\n- ready to publish\n\nThe caption must complement the promotional image and should NOT simply repeat the exact text displayed inside the image.\n\n==================================================\n2. PROMOTIONAL COPY RULE\n==================================================\n\nIf PROMOTIONAL COPY is provided:\n- Preserve its original meaning.\n- Preserve its promotional intent.\n- Preserve the actual offer.\n- Improve the wording naturally.\n- Keep the caption strongly correlated with the original message.\n\nDO NOT invent:\n- prices\n- discounts\n- deadlines\n- promotions\n- guarantees\n- unsupported benefits\n- medical claims\n- exaggerated claims\n\nIf PROMOTIONAL COPY is empty:\n- Determine an appropriate promotional angle from the actual product and PROMOTION THEME.\n\n==================================================\n3. CURIOSITY RULE\n==================================================\n\nThe first sentence must function as the strongest curiosity hook.\n\nCreate an information gap without misleading the audience.\n\nThe reader should naturally think:\n- Kenapa?\n- Apa yang spesial?\n- Kok bisa?\n- Memangnya seenak itu?\n- Apa yang membuat produk ini menarik?\n\nAvoid generic clickbait.\n\n==================================================\n4. CAPTION STRUCTURE\n==================================================\n\nUse this structure:\n\n1. Curiosity Hook\n2. Product Appeal\n3. Promotional Message\n4. Call To Action\n\nRecommended length:\n2–5 short sentences.\n\nUse natural conversational Indonesian.\n\n==================================================\n5. PRODUCT RELEVANCE\n==================================================\n\nOnly mention:\n- characteristics visible in PRODUCT IMAGE\n- information explicitly provided by PROMOTIONAL COPY\n- information reasonably inferable from the actual product\n\nDo not make unsupported factual claims.\n\n==================================================\n6. HASHTAGS\n==================================================\n\nIf hashtags are useful:\n- maximum 5\n- highly relevant to the product\n- relevant to the promotion\n- avoid hashtag spam\n\n==================================================\n7. OUTPUT FORMAT\n==================================================\n\nCAPTION: [final ready-to-publish caption]\n\nHASHTAGS: [optional relevant hashtags]\n",
+
+    "variables": {
+      "PRODUCT_IMAGE": "{{PRODUCT_IMAGE}}",
+      "PROMOTION_THEME": "{{PROMOTION_THEME}}",
+      "PROMOTIONAL_COPY": "{{PROMOTIONAL_COPY}}"
+    },
+
+    "output": {
+      "language": "Indonesian",
+      "length": "2-5 short sentences",
+      "ready_to_publish": true,
+      "multiple_variations": false,
+      "maximum_hashtags": 5
+    }
+  },
+
+  "execution_flow": [
+    {
+      "step": 1,
+      "action": "validate_input",
+      "input": "PRODUCT_IMAGE",
+      "required": true
+    },
+    {
+      "step": 2,
+      "action": "analyze_product",
+      "instruction": "Determine exact product identity from PRODUCT_IMAGE."
+    },
+    {
+      "step": 3,
+      "action": "analyze_promotion_theme",
+      "instruction": "Use PROMOTION_THEME if provided. Otherwise let AI determine the most relevant theme."
+    },
+    {
+      "step": 4,
+      "action": "analyze_promotional_copy",
+      "instruction": "Use PROMOTIONAL_COPY if provided. Improve wording while preserving meaning and promotional intent."
+    },
+    {
+      "step": 5,
+      "action": "analyze_brand_logo",
+      "instruction": "If BRAND_LOGO is provided, preserve and use the exact uploaded logo."
+    },
+    {
+      "step": 6,
+      "action": "generate_image",
+      "instruction": "Generate the professional 9:16 promotional image using image_generator.prompt."
+    },
+    {
+      "step": 7,
+      "action": "quality_control",
+      "instruction": "Verify that the generated product remains identical to PRODUCT_IMAGE."
+    },
+    {
+      "step": 8,
+      "action": "generate_caption",
+      "condition": "GENERATE_CAPTION == true",
+      "instruction": "Generate one ready-to-publish caption using caption_generator.prompt."
+    },
+    {
+      "step": 9,
+      "action": "return_result",
+      "output": [
+        "9:16 promotional image",
+        "ready-to-publish caption when enabled"
+      ]
+    }
+  ],
+
+  "safety_and_truthfulness": {
+    "invented_prices": false,
+    "invented_discounts": false,
+    "invented_deadlines": false,
+    "invented_offers": false,
+    "unsupported_claims": false,
+    "misleading_clickbait": false,
+    "unsupported_medical_claims": false,
+    "fake_branding": false
+  }
+}

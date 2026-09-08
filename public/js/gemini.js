@@ -10,7 +10,7 @@ const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models
 /**
  * AI Food Promotion Generator JSON Specification (v5.0) - Google Nano Banana AI Engine
  */
-const AI_FOOD_PROMO_JSON_CONFIG = {
+let AI_FOOD_PROMO_JSON_CONFIG = {
   "name": "AI Food Promotion Generator",
   "version": "5.0",
   "language": "id-ID",
@@ -131,6 +131,28 @@ const AI_FOOD_PROMO_JSON_CONFIG = {
     "fake_branding": false
   }
 };
+
+/**
+ * Dynamically load JSON configuration from /ai-food-promo-config.json
+ */
+async function loadAIFoodPromoJsonConfig() {
+  try {
+    const res = await fetch('/ai-food-promo-config.json');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.image_generator && data.image_generator.prompt) {
+        AI_FOOD_PROMO_JSON_CONFIG = data;
+        console.log('✅ AI Food Promotion Generator JSON config loaded (v' + data.version + ')');
+      }
+    }
+  } catch (err) {
+    console.warn('Could not fetch /ai-food-promo-config.json, using fallback config:', err);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  loadAIFoodPromoJsonConfig();
+}
 
 /**
  * Convert File object to base64 data URL
